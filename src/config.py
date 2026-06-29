@@ -8,11 +8,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 LOGS_DIR = PROJECT_ROOT / "logs"
 DATA_DIR = PROJECT_ROOT / "data"
-CHECKPOINTS_DIR = PROJECT_ROOT / "checkpoints"
-OUTPUTS_DIR = PROJECT_ROOT / "outputs"
+CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints"
+OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 # Create directories if they don't exist
-for directory in (LOGS_DIR, DATA_DIR, CHECKPOINTS_DIR, OUTPUTS_DIR):
+for directory in (LOGS_DIR, DATA_DIR, CHECKPOINT_DIR, OUTPUT_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 # Device
@@ -43,6 +43,7 @@ BATCH_SIZE = 64
 EPOCHS = 20
 LEARNING_RATE = 1e-3
 WEIGHT_DECAY = 1e-4
+STEP_SIZE = 10
 
 NUM_WORKERS = 2
 PIN_MEMORY = torch.cuda.is_available()

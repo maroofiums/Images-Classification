@@ -44,7 +44,7 @@ class SimpleCNN(nn.Module):
         self.classifier = nn.Sequential(
             nn.Flatten(),
             
-            nn.LazyLinear(512),
+            nn.Linear(128 * 4 * 4, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(0.4),
 

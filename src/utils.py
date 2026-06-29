@@ -101,7 +101,12 @@ def plot_history(history):
     )
     plt.close()
 
-
+history = {
+    "train_loss": [],
+    "val_loss": [],
+    "train_acc": [],
+    "val_acc": [],
+}
 
 
 

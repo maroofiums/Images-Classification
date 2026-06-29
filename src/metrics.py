@@ -44,12 +44,12 @@ def get_classification_report(y_true, y_pred):
         zero_division=0
     )
 
-def print_metrics(metrics):
+def print_metrics(metrics,text):
 
-    print(f"Accuracy : {metrics['accuracy']:.4f}")
-    print(f"Precision: {metrics['precision']:.4f}")
-    print(f"Recall   : {metrics['recall']:.4f}")
-    print(f"F1 Score : {metrics['f1_score']:.4f}")
+    print(f"{text} Accuracy : {metrics['accuracy']:.4f}")
+    print(f"{text} Precision: {metrics['precision']:.4f}")
+    print(f"{text} Recall   : {metrics['recall']:.4f}")
+    print(f"{text} F1 Score : {metrics['f1_score']:.4f}")
 
 if __name__ == "__main__":
 

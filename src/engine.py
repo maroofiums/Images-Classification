@@ -51,7 +51,7 @@ def train_one_epoch(
         )
 
         progress_bar.set_postfix(
-            loss=f"{loss.items():.4f}"
+            loss=f"{loss.item():.4f}"
         )
 
     avg_loss = running_loss / len(dataloader)
@@ -63,7 +63,7 @@ def train_one_epoch(
 
     return avg_loss, metrics
 
-def validation_one_epoch(
+def validate_one_epoch(
     model,
     dataloader,
     criterion,
@@ -105,7 +105,7 @@ def validation_one_epoch(
             )
 
             progress_bar.set_postfix(
-                loss=f"{loss.items():.4f}"
+                loss=f"{loss.item():.4f}"
             )
 
     avg_loss = running_loss / len(dataloader)
