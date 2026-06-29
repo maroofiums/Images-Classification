@@ -1,1 +1,1 @@
-# Images-Classification
+# Images Classification
