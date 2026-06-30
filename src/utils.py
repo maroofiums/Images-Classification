@@ -1,7 +1,9 @@
 import os
 import random
 from pathlib import Path
+import itertools
 
+from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -28,33 +30,32 @@ def set_seed(seed: int = SEED):
 def save_checkpoint(model, optimizer, epoch, best_acc, filename):
     checkpoint = {
         "epoch": epoch,
-        "model_stat_dict":model.state_dict(),
-        "optimizer_stat_dict":optimizer.state_dict(),
-        "best_accuracy":best_acc,
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "best_accuracy": best_acc,
     }
 
-    path = os.path.join(
-        CHECKPOINT_DIR,
-        filename
-    )
+    path = CHECKPOINT_DIR / filename
 
-    torch.save(checkpoint,path)
+    torch.save(checkpoint, path)
 
-    print(f"checkpoint saved to {path}")
+    print(f"Checkpoint saved to {path}")
 
 def load_checkpoint(model, optimizer, filename, device):
-    path = os.path.join(
-        CHECKPOINT_DIR,
-        filename
-    )
+
+    path = CHECKPOINT_DIR / filename
+
     checkpoint = torch.load(path, map_location=device)
-    model.load_state_dict(checkpoint["model_stat_dict"])
+
+    model.load_state_dict(checkpoint["model_state_dict"])
+
     if optimizer is not None:
-        optimizer.load_state_dict(checkpoint["optimizer_stat_dict"])
+        optimizer.load_state_dict(
+            checkpoint["optimizer_state_dict"]
+        )
 
     epoch = checkpoint["epoch"]
     best_acc = checkpoint["best_accuracy"]
-
 
     print(f"Checkpoint loaded from {path}")
 
@@ -112,3 +113,81 @@ history = {
 
 def ensure_dir(path):
     Path(path).mkdir(parents=True, exist_ok=True)
+
+
+def plot_confusion_matrix(
+    y_true,
+    y_pred,
+    class_names,
+    normalize=False,
+    filename="confusion_matrix.png",
+):
+    """
+    Plot and save confusion matrix.
+
+    Args:
+        y_true: Ground truth labels
+        y_pred: Predicted labels
+        class_names: List/Tuple of class names
+        normalize: If True, normalize each row
+        filename: Output image filename
+    """
+
+    cm = confusion_matrix(y_true, y_pred)
+
+    if normalize:
+        cm = cm.astype("float") / cm.sum(axis=1, keepdims=True)
+        cm = np.nan_to_num(cm)
+
+    plt.figure(figsize=(10, 8))
+
+    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+
+    plt.title("Confusion Matrix")
+
+    plt.colorbar()
+
+    tick_marks = np.arange(len(class_names))
+
+    plt.xticks(
+        tick_marks,
+        class_names,
+        rotation=45,
+        ha="right",
+    )
+
+    plt.yticks(
+        tick_marks,
+        class_names,
+    )
+
+    threshold = cm.max() / 2
+
+    fmt = ".2f" if normalize else "d"
+
+    for i, j in itertools.product(
+        range(cm.shape[0]),
+        range(cm.shape[1]),
+    ):
+
+        plt.text(
+            j,
+            i,
+            format(cm[i, j], fmt),
+            horizontalalignment="center",
+            color="white" if cm[i, j] > threshold else "black",
+        )
+
+    plt.ylabel("True Label")
+
+    plt.xlabel("Predicted Label")
+
+    plt.tight_layout()
+
+    save_path = OUTPUT_DIR / filename
+
+    plt.savefig(save_path, dpi=300)
+
+    plt.close()
+
+    print(f"Confusion matrix saved to {save_path}")
