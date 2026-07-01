@@ -1,19 +1,16 @@
 torch
 torchvision
-torchaudio
+
+fastapi
+uvicorn
 
 numpy
 matplotlib
-Pillow
-
 scikit-learn
+pillow
+
 tqdm
-
-fastapi
-uvicorn[standard]
-
-python-multipart
-pydantic
-
 pytest
+pytest-cov
+python-multipart
 httpx

@@ -1,35 +1,36 @@
 # Image Classification with PyTorch & FastAPI
 
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red?logo=pytorch)
+![Torchvision](https://img.shields.io/badge/Torchvision-Latest-orange)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.116-green?logo=fastapi)
+![Pytest](https://img.shields.io/badge/Tests-Pytest-success?logo=pytest)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
 A production-style Image Classification project built with **PyTorch** and **FastAPI** using the **CIFAR-10** dataset.
 
-The project demonstrates the complete deep learning workflow:
+The project demonstrates a complete deep learning workflow from dataset preparation to deployment through a REST API.
 
-* Dataset preparation
-* Data augmentation
-* CNN model training
-* Model evaluation
-* Inference on new images
-* REST API deployment with FastAPI
+## Features
 
----
-
-# Features
-
-* Clean project architecture
-* Modular PyTorch codebase
-* CIFAR-10 dataset support
-* Data augmentation
-* Training & validation pipeline
+* Clean and modular project architecture
+* Custom CNN for CIFAR-10
+* Data augmentation with TorchVision
+* Training and validation pipeline
 * Accuracy, Precision, Recall, and F1-score
-* Checkpoint saving/loading
-* Loss & accuracy visualization
+* Classification report and confusion matrix
+* Checkpoint saving and loading
+* Training history visualization
 * Image inference
 * FastAPI REST API
+* Structured logging
+* Unit testing with Pytest
+* Type hints and documentation
 * Easy to extend with pretrained models
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 Image-Classification/
@@ -39,8 +40,17 @@ Image-Classification/
 │   └── schemas.py
 │
 ├── checkpoints/
+│
 ├── data/
+│
+├── images/
+│
 ├── logs/
+│   ├── app.log
+│   ├── access.log
+│   ├── error.log
+│   └── inference.log
+│
 ├── outputs/
 │
 ├── src/
@@ -49,22 +59,27 @@ Image-Classification/
 │   ├── engine.py
 │   ├── evaluate.py
 │   ├── inference.py
+│   ├── logger.py
 │   ├── metrics.py
 │   ├── model.py
 │   ├── train.py
 │   └── utils.py
 │
+├── tests/
+│
+├── pytest.ini
 ├── requirements.txt
 └── README.md
+
 ```
 
 ---
 
-# Dataset
+## Dataset
 
 This project uses the **CIFAR-10** dataset.
 
-Classes:
+**Classes**
 
 * airplane
 * automobile
@@ -77,145 +92,99 @@ Classes:
 * ship
 * truck
 
-Dataset Statistics
+### Dataset Statistics
 
-* Training Images: 50,000
-* Test Images: 10,000
-* Image Size: 32 × 32
-* Number of Classes: 10
+* Training Images: **50,000**
+* Test Images: **10,000**
+* Image Size: **32 × 32**
+* Number of Classes: **10**
 
 ---
 
-# Model Architecture
+## Model Summary
 
-```
-<<<<<<< HEAD
-        Input Image
-            ↓
-        Conv Block
-            ↓
-        Conv Block
-            ↓
-         Max Pool
-            ↓
-        Conv Block
-            ↓
-        Conv Block
-            ↓
-         Max Pool
-            ↓
-        Conv Block
-            ↓
-        Conv Block
-            ↓
-         Max Pool
-            ↓
-         Flatten
-            ↓
-      Fully Connected
-            ↓
-         Dropout
-            ↓
-      Fully Connected
-            ↓
-    Output (10 Classes)
-=======
-            Input Image
-                ↓
-            Conv Block
-                ↓
-            Conv Block
-                ↓
-            Max Pool
-                ↓
-            Conv Block
-                ↓
-            Conv Block
-                ↓
-             Max Pool
-                ↓
-            Conv Block
-                ↓
-            Conv Block
-                ↓
-             Max Pool
-                ↓
-             Flatten
-                ↓
-          Fully Connected
-                ↓
-             Dropout
-                ↓
-          Fully Connected
-                ↓
-        Output (10 Classes)
->>>>>>> 8dab697755c6bda4f31721d79b476e67fff2e735
+| Property | Value |
+| --- | --- |
+| Dataset | CIFAR-10 |
+| Input Size | 3 × 32 × 32 |
+| Number of Classes | 10 |
+| Architecture | Custom CNN |
+| Activation | ReLU |
+| Batch Normalization | ✅ |
+| Dropout | ✅ |
+| Optimizer | Adam |
+| Loss Function | CrossEntropyLoss |
+| LR Scheduler | StepLR |
+| Trainable Parameters | **1,470,442** |
+
+---
+
+## Model Architecture
+
+```mermaid
+graph TD
+    Input[Input Image: 3 × 32 × 32] --> CB1[Conv Block: 3 → 32]
+    CB1 --> CB2[Conv Block: 32 → 32]
+    CB2 --> MP1[Max Pool]
+    
+    MP1 --> CB3[Conv Block: 32 → 64]
+    CB3 --> CB4[Conv Block: 64 → 64]
+    CB4 --> MP2[Max Pool]
+    
+    MP2 --> CB5[Conv Block: 64 → 128]
+    CB5 --> CB6[Conv Block: 128 → 128]
+    CB6 --> MP3[Max Pool]
+    
+    MP3 --> Flat[Flatten]
+    Flat --> FC1[Linear: 2048 → 512]
+    FC1 --> Act1[ReLU]
+    Act1 --> DO1[Dropout: 0.4]
+    
+    DO1 --> FC2[Linear: 512 → 256]
+    FC2 --> Act2[ReLU]
+    Act2 --> DO2[Dropout: 0.3]
+    
+    DO2 --> Out[Linear: 256 → 10]
+    
+    %% Styling
+    style Input fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style Out fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    style Flat fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+
 ```
 
 ---
 
-# Installation
-
-Clone the repository
-
-```bash
-git clone https://github.com/maroofiums/Images-Classification.git
-
-cd Image-Classification
-```
-
-Create a virtual environment
-
-### Windows
-
-```bash
-python -m venv .venv
-
-.venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-python3 -m venv .venv
-
-source .venv/bin/activate
-```
-
-Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Train the Model
+## Train the Model
 
 ```bash
 python -m src.train
+
 ```
 
-During training the project will:
+Training automatically:
 
-* Train the CNN
-* Validate after every epoch
-* Save the best checkpoint
-* Generate training plots
+* Downloads the dataset (first run only)
+* Trains the CNN
+* Validates after every epoch
+* Saves the best checkpoint
+* Generates loss and accuracy plots
 
 Saved checkpoint:
 
-```
+```text
 checkpoints/
-    best_model.pth
+└── best_model.pth
+
 ```
 
 ---
 
-# Evaluate the Model
+## Evaluate the Model
 
 ```bash
 python -m src.evaluate
+
 ```
 
 Evaluation includes:
@@ -224,97 +193,164 @@ Evaluation includes:
 * Accuracy
 * Precision
 * Recall
-* F1 Score
+* F1-score
 * Classification Report
 * Confusion Matrix
+* Normalized Confusion Matrix
+
+Generated outputs:
+
+```text
+outputs/
+├── loss_curve.png
+├── acc_curve.png
+├── confusion_matrix.png
+└── normalized_confusion_matrix.png
+
+```
 
 ---
 
-# Run Inference
+## Run Inference
 
 ```bash
 python -m src.inference
+
 ```
 
-Example Output
+Example output:
 
 ```python
 {
-    "class": "dog",
+    "class_name": "dog",
     "confidence": 0.9873
 }
+
 ```
 
 ---
 
-# Run FastAPI Server
+## Run FastAPI Server
 
 ```bash
 uvicorn app.main:app --reload
-```
-
-Open your browser:
 
 ```
-http://127.0.0.1:8000/docs
+
+Open:
+
+```text
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
 ```
 
-Swagger UI allows you to upload an image and receive predictions.
-
-Example Response
+Example response:
 
 ```json
 {
-    "predicted_class": "cat",
+    "class_name": "cat",
     "confidence": 0.9968
 }
+
 ```
 
 ---
 
-# Project Workflow
+## Testing
+
+Run all tests:
+
+```bash
+pytest
 
 ```
-         Dataset
-            ↓
-       Preprocessing
-            ↓
-         Training
-            ↓
-        Validation
-            ↓
-        Checkpoint
-            ↓
-        Evaluation
-            ↓
-        Inference
-            ↓
-     FastAPI Deployment
+
+Run with coverage:
+
+```bash
+pytest --cov=src
+
+```
+
+Generate HTML coverage:
+
+```bash
+pytest --cov=src --cov-report=html
+
 ```
 
 ---
 
-# Technologies Used
+## Logging
+
+The application automatically creates log files inside the `logs/` directory.
+
+```text
+logs/
+├── app.log
+├── access.log
+├── error.log
+└── inference.log
+
+```
+
+---
+
+## Project Workflow
+
+```mermaid
+graph LR
+    Dataset --> Preprocessing
+    Preprocessing --> Training
+    Training --> Validation
+    Validation --> Checkpoint
+    Checkpoint --> Evaluation
+    Evaluation --> Inference
+    Inference --> FastAPI[FastAPI Deployment]
+
+    %% Styling
+    style Dataset fill:#ede7f6,stroke:#5e35b1,stroke-width:2px
+    style FastAPI fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+
+```
+
+---
+
+## Results
+
+### Training Loss
+
+### Training Accuracy
+
+### Confusion Matrix
+
+### Normalized Confusion Matrix
+
+---
+
+## Technologies Used
 
 * Python
 * PyTorch
-* Torchvision
-* NumPy
-* Scikit-learn
-* Matplotlib
-* Pillow
+* TorchVision
 * FastAPI
 * Uvicorn
 * Pydantic
+* NumPy
+* Matplotlib
+* Pillow
+* Scikit-learn
+* Pytest
 * tqdm
 
 ---
 
-# Future Improvements
+## Future Improvements
 
 * Transfer Learning (ResNet, EfficientNet, ConvNeXt)
+* Vision Transformer (ViT)
+* Mixed Precision Training (AMP)
 * TensorBoard Integration
-* Mixed Precision Training
 * Early Stopping
 * Learning Rate Warmup
 * Docker Support
@@ -326,15 +362,15 @@ Example Response
 
 ---
 
-# License
+## License
 
 This project is released under the MIT License.
 
 ---
 
-# Acknowledgements
+## Acknowledgements
 
 * PyTorch
-* Torchvision
+* TorchVision
 * FastAPI
 * CIFAR-10 Dataset
