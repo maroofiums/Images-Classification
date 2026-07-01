@@ -89,63 +89,35 @@ Dataset Statistics
 # Model Architecture
 
 ```
-Input Image
-
-↓
-
-Conv Block
-
-↓
-
-Conv Block
-
-↓
-
-Max Pool
-
-↓
-
-Conv Block
-
-↓
-
-Conv Block
-
-↓
-
-Max Pool
-
-↓
-
-Conv Block
-
-↓
-
-Conv Block
-
-↓
-
-Max Pool
-
-↓
-
-Flatten
-
-↓
-
-Fully Connected
-
-↓
-
-Dropout
-
-↓
-
-Fully Connected
-
-↓
-
-Output (10 Classes)
+        Input Image
+            ↓
+        Conv Block
+            ↓
+        Conv Block
+            ↓
+         Max Pool
+            ↓
+        Conv Block
+            ↓
+        Conv Block
+            ↓
+         Max Pool
+            ↓
+        Conv Block
+            ↓
+        Conv Block
+            ↓
+         Max Pool
+            ↓
+         Flatten
+            ↓
+      Fully Connected
+            ↓
+         Dropout
+            ↓
+      Fully Connected
+            ↓
+    Output (10 Classes)
 ```
 
 ---
@@ -271,21 +243,21 @@ Example Response
 # Project Workflow
 
 ```
-Dataset
-   ↓
-Preprocessing
-   ↓
-Training
-   ↓
-Validation
-   ↓
-Checkpoint
-   ↓
-Evaluation
-   ↓
-Inference
-   ↓
-FastAPI Deployment
+         Dataset
+            ↓
+       Preprocessing
+            ↓
+         Training
+            ↓
+        Validation
+            ↓
+        Checkpoint
+            ↓
+        Evaluation
+            ↓
+        Inference
+            ↓
+     FastAPI Deployment
 ```
 
 ---

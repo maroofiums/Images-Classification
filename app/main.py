@@ -6,6 +6,11 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 
 from app.schemas import PredictionResponse
 from src.inference import load_model, predict_image
+from src.logger import (
+    app_logger,
+    access_logger,
+    error_logger,
+)
 
 app = FastAPI(
     title="Image Classification API",
@@ -13,6 +18,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+@app.on_event("startup")
+async def startup():
+    app_logger.info("API started")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    app_logger.info("API stopped")
 
 model = load_model()
 
@@ -45,6 +59,10 @@ async def predict(file: UploadFile = File(...)):
         parents=True,
     )
 
+    access_logger.info(
+        f"Request received: {file.filename}"
+    )
+
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(
             file.file,
@@ -62,6 +80,10 @@ async def predict(file: UploadFile = File(...)):
             predicted_class=prediction["class"],
             confidence=prediction["confidence"],
         )
+    
+    except Exception as e:
+        error_logger.exception(e)
+        raise
 
     finally:
 

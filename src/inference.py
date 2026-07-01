@@ -12,6 +12,7 @@ from src.config import (
 )
 from src.model import build_model
 from src.utils import load_checkpoint
+from src.logger import inference_logger
 
 
 transform = transforms.Compose([
@@ -60,13 +61,19 @@ def predict_image(image_path, model):
             dim=1,
         )
 
-    predicted_class = CLASS_NAMES[prediction.item()]
+    confidence = confidence.item()
+    prediction = prediction.item()
+
+    predicted_class = CLASS_NAMES[prediction]
+
+    inference_logger.info(
+        f"Prediction: {predicted_class} ({confidence:.4f})"
+    )
 
     return {
         "class": predicted_class,
-        "confidence": float(confidence.item()),
+        "confidence": confidence,
     }
-
 
 
 if __name__ == "__main__":

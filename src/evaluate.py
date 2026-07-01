@@ -15,8 +15,11 @@ from src.metrics import (
 )
 from src.model import build_model
 from src.utils import load_checkpoint,plot_confusion_matrix
+from src.logger import app_logger
+
 
 def evaluate():
+    app_logger.info("Evaluation started")
 
     _,_,test_loader = get_dataloaders()
 

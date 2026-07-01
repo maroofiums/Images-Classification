@@ -20,8 +20,11 @@ from src.utils import (
     plot_history,
     count_parameters,
 )
+from src.logger import app_logger
+
 
 def train():
+    app_logger.info("Training started")
 
     set_seed()
 
@@ -57,7 +60,8 @@ def train():
 
     for epoch in range(EPOCHS):
 
-        print(f"\nEpoch [{epoch+1}/{EPOCHS}]")
+        
+        app_logger.info(f"Epoch {epoch+1}/{EPOCHS}")
 
         train_loss, train_metrics = train_one_epoch(
             model,
