@@ -3,20 +3,19 @@ from pathlib import Path
 import torch
 from PIL import Image
 
+from src.config import IMAGES_DIR
 from src.inference import (
     load_model,
     predict_image,
 )
 
-from src.config import IMAGES_DIR
-
 
 class DummyModel(torch.nn.Module):
     """
-    A dummy model that always predicts class 0.
+    Dummy model that always predicts class 0.
     """
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         batch_size = x.shape[0]
 
         output = torch.zeros(batch_size, 10)
@@ -26,9 +25,9 @@ class DummyModel(torch.nn.Module):
         return output
 
 
-def test_predict_image(tmp_path):
+def test_predict_image(tmp_path: Path) -> None:
 
-    image_path = IMAGES_DIR / "airplane.jpg"
+    image_path = tmp_path / "airplane.jpg"
 
     image = Image.new(
         "RGB",
@@ -45,18 +44,10 @@ def test_predict_image(tmp_path):
         model=model,
     )
 
-    assert isinstance(prediction, dict)
-
-    assert "class" in prediction
-    assert "confidence" in prediction
-
-    assert prediction["class"] == "airplane"
-
+    assert prediction["class_name"] == "airplane"
     assert 0.0 <= prediction["confidence"] <= 1.0
 
-
-
-def test_load_model():
+def test_load_model() -> None:
 
     model = load_model()
 

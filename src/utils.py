@@ -1,13 +1,14 @@
-import os
-import random
-from pathlib import Path
 import itertools
+import random
+from collections.abc import Sequence
+from pathlib import Path
 
-from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import numpy as np
-
 import torch
+import torch.nn as nn
+from sklearn.metrics import confusion_matrix
+from torch.optim import Optimizer
 
 from src.config import (
     CHECKPOINT_DIR,
@@ -15,7 +16,15 @@ from src.config import (
     SEED,
 )
 
-def set_seed(seed: int = SEED):
+
+def set_seed(seed: int = SEED) -> None:
+    """
+    Set random seeds for reproducibility.
+
+    Args:
+        seed: Random seed value.
+    """
+
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -25,9 +34,27 @@ def set_seed(seed: int = SEED):
         torch.cuda.manual_seed_all(seed)
 
     torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark= False
+    torch.backends.cudnn.benchmark = False
 
-def save_checkpoint(model, optimizer, epoch, best_acc, filename):
+
+def save_checkpoint(
+    model: nn.Module,
+    optimizer: Optimizer,
+    epoch: int,
+    best_acc: float,
+    filename: str,
+) -> None:
+    """
+    Save a training checkpoint.
+
+    Args:
+        model: Trained model.
+        optimizer: Optimizer.
+        epoch: Current epoch.
+        best_acc: Best validation accuracy.
+        filename: Checkpoint filename.
+    """
+
     checkpoint = {
         "epoch": epoch,
         "model_state_dict": model.state_dict(),
@@ -41,13 +68,36 @@ def save_checkpoint(model, optimizer, epoch, best_acc, filename):
 
     print(f"Checkpoint saved to {path}")
 
-def load_checkpoint(model, optimizer, filename, device):
+
+def load_checkpoint(
+    model: nn.Module,
+    optimizer: Optimizer | None,
+    filename: str,
+    device: str,
+) -> tuple[nn.Module, Optimizer | None, int, float]:
+    """
+    Load a saved checkpoint.
+
+    Args:
+        model: Model instance.
+        optimizer: Optimizer instance or None.
+        filename: Checkpoint filename.
+        device: Device to load checkpoint onto.
+
+    Returns:
+        Model, optimizer, epoch, best accuracy.
+    """
 
     path = CHECKPOINT_DIR / filename
 
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(
+        path,
+        map_location=device,
+    )
 
-    model.load_state_dict(checkpoint["model_state_dict"])
+    model.load_state_dict(
+        checkpoint["model_state_dict"]
+    )
 
     if optimizer is not None:
         optimizer.load_state_dict(
@@ -61,48 +111,110 @@ def load_checkpoint(model, optimizer, filename, device):
 
     return model, optimizer, epoch, best_acc
 
-def count_parameters(model):
+
+def count_parameters(
+    model: nn.Module,
+) -> int:
+    """
+    Count trainable parameters.
+
+    Args:
+        model: PyTorch model.
+
+    Returns:
+        Number of trainable parameters.
+    """
+
     return sum(
-        p.numel()
-        for p in model.parameters()
-        if p.requires_grad
+        parameter.numel()
+        for parameter in model.parameters()
+        if parameter.requires_grad
     )
 
-def plot_history(history):
-    epochs = range(1, len(history["train_loss"]) + 1)
 
-    plt.plot(epochs,history["train_loss"],label="Train")
-    plt.plot(epochs,history["val_loss"],label="Validation")
+def plot_history(
+    history: dict[str, list[float]],
+) -> None:
+    """
+    Plot training history.
+
+    Args:
+        history: Training history dictionary.
+    """
+
+    epochs = range(
+        1,
+        len(history["train_loss"]) + 1,
+    )
+
+    # Loss Curve
+
+    plt.figure(figsize=(8, 5))
+
+    plt.plot(
+        epochs,
+        history["train_loss"],
+        label="Train",
+    )
+
+    plt.plot(
+        epochs,
+        history["val_loss"],
+        label="Validation",
+    )
+
     plt.xlabel("Epoch")
+
     plt.ylabel("Loss")
+
     plt.title("Training Loss")
+
     plt.legend()
+
     plt.grid(True)
 
     plt.savefig(
-        os.path.join(
-            OUTPUT_DIR,
-            "loss_curve.png"
-        )
+        OUTPUT_DIR / "loss_curve.png",
+        dpi=300,
     )
+
     plt.close()
-    plt.plot(epochs,history["train_acc"],label="Train")
-    plt.plot(epochs,history["val_acc"],label="Validation")
+
+    # Accuracy Curve
+
+    plt.figure(figsize=(8, 5))
+
+    plt.plot(
+        epochs,
+        history["train_acc"],
+        label="Train",
+    )
+
+    plt.plot(
+        epochs,
+        history["val_acc"],
+        label="Validation",
+    )
+
     plt.xlabel("Epoch")
-    plt.ylabel("Loss")
+
+    plt.ylabel("Accuracy")
+
     plt.title("Training Accuracy")
+
     plt.legend()
+
     plt.grid(True)
 
     plt.savefig(
-        os.path.join(
-            OUTPUT_DIR,
-            "acc_curve.png"
-        )
+        OUTPUT_DIR / "acc_curve.png",
+        dpi=300,
     )
+
     plt.close()
 
-history = {
+
+history: dict[str, list[float]] = {
     "train_loss": [],
     "val_loss": [],
     "train_acc": [],
@@ -110,44 +222,68 @@ history = {
 }
 
 
+def ensure_dir(
+    path: Path | str,
+) -> None:
+    """
+    Create a directory if it does not exist.
 
-def ensure_dir(path):
-    Path(path).mkdir(parents=True, exist_ok=True)
+    Args:
+        path: Directory path.
+    """
+
+    Path(path).mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
 
 def plot_confusion_matrix(
-    y_true,
-    y_pred,
-    class_names,
-    normalize=False,
-    filename="confusion_matrix.png",
-):
+    y_true: Sequence[int],
+    y_pred: Sequence[int],
+    class_names: Sequence[str],
+    normalize: bool = False,
+    filename: str = "confusion_matrix.png",
+) -> None:
     """
-    Plot and save confusion matrix.
+    Plot and save the confusion matrix.
 
     Args:
-        y_true: Ground truth labels
-        y_pred: Predicted labels
-        class_names: List/Tuple of class names
-        normalize: If True, normalize each row
-        filename: Output image filename
+        y_true: Ground truth labels.
+        y_pred: Predicted labels.
+        class_names: Class names.
+        normalize: Whether to normalize the confusion matrix.
+        filename: Output filename.
     """
 
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(
+        y_true,
+        y_pred,
+    )
 
     if normalize:
-        cm = cm.astype("float") / cm.sum(axis=1, keepdims=True)
+        cm = cm.astype(float)
+        cm /= cm.sum(
+            axis=1,
+            keepdims=True,
+        )
         cm = np.nan_to_num(cm)
 
     plt.figure(figsize=(10, 8))
 
-    plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+    plt.imshow(
+        cm,
+        interpolation="nearest",
+        cmap=plt.cm.Blues,
+    )
 
     plt.title("Confusion Matrix")
 
     plt.colorbar()
 
-    tick_marks = np.arange(len(class_names))
+    tick_marks = np.arange(
+        len(class_names)
+    )
 
     plt.xticks(
         tick_marks,
@@ -169,13 +305,16 @@ def plot_confusion_matrix(
         range(cm.shape[0]),
         range(cm.shape[1]),
     ):
-
         plt.text(
             j,
             i,
             format(cm[i, j], fmt),
-            horizontalalignment="center",
-            color="white" if cm[i, j] > threshold else "black",
+            ha="center",
+            color=(
+                "white"
+                if cm[i, j] > threshold
+                else "black"
+            ),
         )
 
     plt.ylabel("True Label")
@@ -186,8 +325,13 @@ def plot_confusion_matrix(
 
     save_path = OUTPUT_DIR / filename
 
-    plt.savefig(save_path, dpi=300)
+    plt.savefig(
+        save_path,
+        dpi=300,
+    )
 
     plt.close()
 
-    print(f"Confusion matrix saved to {save_path}")
+    print(
+        f"Confusion matrix saved to {save_path}"
+    )
