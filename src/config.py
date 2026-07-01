@@ -10,9 +10,10 @@ LOGS_DIR = PROJECT_ROOT / "logs"
 DATA_DIR = PROJECT_ROOT / "data"
 CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints"
 OUTPUT_DIR = PROJECT_ROOT / "outputs"
+IMAGES_DIR = PROJECT_ROOT / "images"
 
 # Create directories if they don't exist
-for directory in (LOGS_DIR, DATA_DIR, CHECKPOINT_DIR, OUTPUT_DIR):
+for directory in (LOGS_DIR, DATA_DIR, CHECKPOINT_DIR, OUTPUT_DIR, IMAGES_DIR):
     directory.mkdir(parents=True, exist_ok=True)
 
 # Device

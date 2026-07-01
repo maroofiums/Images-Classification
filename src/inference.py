@@ -9,6 +9,7 @@ from src.config import (
     DEVICE,
     CHECKPOINT_NAME,
     CLASS_NAMES,
+    IMAGES_DIR
 )
 from src.model import build_model
 from src.utils import load_checkpoint
@@ -80,7 +81,7 @@ if __name__ == "__main__":
 
     model = load_model()
 
-    image_path = Path("sample.jpg")
+    image_path = IMAGES_DIR / "dog.jpg"
 
     result = predict_image(image_path, model)
 
