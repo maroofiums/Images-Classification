@@ -1,0 +1,16 @@
+torch
+torchvision
+torchaudio
+
+numpy
+matplotlib
+Pillow
+
+scikit-learn
+tqdm
+
+fastapi
+uvicorn[standard]
+
+python-multipart
+pydantic
